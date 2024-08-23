@@ -140,6 +140,7 @@ def remove_files(file_list):
 
     for file_path in remove_files:
         os.remove(file_path)
+        logging.info(f"File {original_file_path} removed.")
 
 if __name__ == '__main__':
 
