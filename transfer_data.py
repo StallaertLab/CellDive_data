@@ -2,6 +2,7 @@ import os
 import shutil
 import filecmp
 import logging
+import re
 from datetime import datetime
 
 def setup_logging(log_file):
@@ -131,16 +132,16 @@ def find_files_to_delete(original_dir, new_dir, pattern, restriction_list = None
             file_size = os.path.getsize(original_file_path)
             total_size += file_size
 
-            logging.info(f"File marked for deletion: {original_file_path}, {format_size(total_size)}")
+            logging.info(f"File marked for deletion: {original_file_path}, {format_size(file_size)}")
 
     return to_del_files, total_size
 
 def remove_files(file_list):
     """Deletes a list of files."""
 
-    for file_path in remove_files:
+    for file_path in file_list:
         os.remove(file_path)
-        logging.info(f"File {original_file_path} removed.")
+        logging.info(f"File {file_path} removed.")
 
 if __name__ == '__main__':
 
@@ -172,29 +173,29 @@ if __name__ == '__main__':
         copy_status = copy_files(original_dir, new_dir, files_to_copy)
         logging.info(f'Copy status: {copy_status}')
 
-        # # find and delete tiles
-        # logging.info(f'Mark tiles for deletion.')
-        # pattern = re.compile(r'CD02011\\(?![01]\.)[^\\]*\\raw')
-        # to_del_files, total_size = find_files_to_delete(original_dir, new_dir, pattern)
-        # logging.info(f'Total size of tiles to delete: {format_size(total_size)}')
+        # find and delete tiles
+        logging.info(f'Mark tiles for deletion.')
+        pattern = re.compile(r'CD02011\\(?![01]\.)[^\\]*\\raw')
+        to_del_files, total_size = find_files_to_delete(original_dir, new_dir, pattern)
+        logging.info(f'Total size of tiles to delete: {format_size(total_size)}')
 
-        # #remove_files(to_del_files)
+        remove_files(to_del_files)
 
-        # # find and delete stitched images
-        # # it only moves files when there was a repeat of the imaging round (otherwise the files are moved automatically to final)
-        # logging.info(f'Mark stitched signal images for deletion.')
-        # pattern = re.compile(r'CD02011\\([2-9][0-9]*|1[0-9]*)\.0\.4(\.[^\\]*)?\\(?!raw\\)')
-        # to_del_files, total_size = find_files_to_delete(original_dir, new_dir, pattern)
-        # logging.info(f'Total size of stitched signal images to delete: {format_size(total_size)}')
+        # find and delete stitched images
+        # it only moves files when there was a repeat of the imaging round (otherwise the files are moved automatically to final)
+        logging.info(f'Mark stitched signal images for deletion.')
+        pattern = re.compile(r'CD02011\\([2-9][0-9]*|1[0-9]*)\.0\.4(\.[^\\]*)?\\(?!raw\\)')
+        to_del_files, total_size = find_files_to_delete(original_dir, new_dir, pattern)
+        logging.info(f'Total size of stitched signal images to delete: {format_size(total_size)}')
 
-        # #remove_files(to_del_files)
+        remove_files(to_del_files)
 
-        # # find and delete AF stitched images
-        # # if AF round was repeated
-        # logging.info(f'Mark stitched redundant AF images for deletion.')
-        # pattern = re.compile(r'CD02011\\([2-9][0-9]*|1[0-9]*)\.0\.1(\.[^\\]*)?\\(?!raw\\)')
-        # redundant_af_list = find_redundant_af(original_dir)
-        # to_del_files, total_size = find_files_to_delete(original_dir, new_dir, pattern, restriction_list = redundant_af_list)
-        # logging.info(f'Total size of stitched redundant AF images to delete: {format_size(total_size)}')
+        # find and delete AF stitched images
+        # if AF round was repeated
+        logging.info(f'Mark stitched redundant AF images for deletion.')
+        pattern = re.compile(r'CD02011\\([2-9][0-9]*|1[0-9]*)\.0\.1(\.[^\\]*)?\\(?!raw\\)')
+        redundant_af_list = find_redundant_af(original_dir)
+        to_del_files, total_size = find_files_to_delete(original_dir, new_dir, pattern, restriction_list = redundant_af_list)
+        logging.info(f'Total size of stitched redundant AF images to delete: {format_size(total_size)}')
 
-        # #remove_files(to_del_files)
+        remove_files(to_del_files)
